@@ -129,14 +129,24 @@ export const PageIOM = ({ data }) => {
                         </span>
                       </div>
 
-                      {/* Display attached photo preview directly */}
+                      {/* Display attached photo preview with manual size & align */}
                       {isImage && (
-                        <div className="ml-5 mt-1 border border-black/40 rounded p-1 bg-white inline-block shadow-sm">
-                          <img
-                            src={imageSrc}
-                            alt={dp.fileName || `Foto Data Pendukung ${idx + 1}`}
-                            className="max-h-[160px] max-w-[320px] object-contain rounded"
-                          />
+                        <div className={`mt-1.5 flex ${dp.photoAlign === 'center' ? 'justify-center' : 'justify-start pl-5'}`}>
+                          <div className="border border-black/40 rounded p-1 bg-white inline-block shadow-sm">
+                            <img
+                              src={imageSrc}
+                              alt={dp.fileName || `Foto Data Pendukung ${idx + 1}`}
+                              className={`object-contain rounded ${
+                                dp.photoSize === 'small'
+                                  ? 'max-h-[95px] max-w-[190px]'
+                                  : dp.photoSize === 'large'
+                                  ? 'max-h-[220px] max-w-[440px]'
+                                  : dp.photoSize === 'full'
+                                  ? 'max-h-[300px] w-full max-w-[560px]'
+                                  : 'max-h-[150px] max-w-[300px]'
+                              }`}
+                            />
+                          </div>
                         </div>
                       )}
                     </div>

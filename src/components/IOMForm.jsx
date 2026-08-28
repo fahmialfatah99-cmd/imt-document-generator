@@ -129,6 +129,15 @@ export const IOMForm = ({ data, onChange }) => {
     reader.readAsDataURL(file);
   };
 
+  const updateDataPendukungMeta = (index, key, value) => {
+    const list = [...(data.dataPendukung || [])];
+    const current = list[index];
+    if (typeof current === 'object' && current !== null) {
+      list[index] = { ...current, [key]: value };
+      updateField('dataPendukung', list);
+    }
+  };
+
   const removeDataPendukungFile = (index) => {
     const list = [...(data.dataPendukung || [])];
     const current = list[index];
@@ -360,37 +369,94 @@ export const IOMForm = ({ data, onChange }) => {
                   </button>
                 </div>
 
-                {/* Attached File/Photo Indicator with Image Preview */}
+                {/* Attached File/Photo Indicator with Image Preview & Layout Controls */}
                 {hasFile && (
-                  <div className="ml-7 bg-white p-2.5 rounded-xl border border-emerald-200 text-xs flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      {dp.fileData && dp.fileData.startsWith('data:image/') ? (
-                        <img
-                          src={dp.fileData}
-                          alt="Thumbnail"
-                          className="h-12 w-16 object-contain rounded border bg-slate-50 p-0.5"
-                        />
-                      ) : (
-                        <FileCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-                      )}
-                      <div>
-                        <span className="font-semibold text-emerald-900 block truncate max-w-[240px] sm:max-w-md">
-                          {dp.fileName}
-                        </span>
-                        <span className="text-[10px] text-slate-400">
-                          {dp.fileSize || 'Lampiran tersimpan'}
-                          {dp.fileData?.startsWith('data:image/') ? ' • Foto siap ditampilkan di dokumen' : ''}
-                        </span>
+                  <div className="ml-7 bg-white p-3 rounded-xl border border-emerald-200 text-xs space-y-2.5 shadow-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        {dp.fileData && dp.fileData.startsWith('data:image/') ? (
+                          <img
+                            src={dp.fileData}
+                            alt="Thumbnail"
+                            className="h-12 w-16 object-contain rounded-lg border bg-slate-50 p-0.5"
+                          />
+                        ) : (
+                          <FileCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+                        )}
+                        <div>
+                          <span className="font-semibold text-emerald-900 block truncate max-w-[240px] sm:max-w-md">
+                            {dp.fileName}
+                          </span>
+                          <span className="text-[10px] text-slate-400">
+                            {dp.fileSize || 'Lampiran tersimpan'}
+                            {dp.fileData?.startsWith('data:image/') ? ' • Foto aktif di dokumen' : ''}
+                          </span>
+                        </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => removeDataPendukungFile(idx)}
+                        className="text-slate-400 hover:text-rose-600 p-1.5 hover:bg-rose-50 rounded-lg transition"
+                        title="Hapus lampiran ini"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeDataPendukungFile(idx)}
-                      className="text-slate-400 hover:text-rose-600 p-1.5 hover:bg-rose-50 rounded-lg transition"
-                      title="Hapus lampiran ini"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+
+                    {/* Manual Layout & Size Controls for Attached Image */}
+                    {dp.fileData && dp.fileData.startsWith('data:image/') && (
+                      <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[11px] bg-slate-50/70 p-2 rounded-lg">
+                        {/* Size Controls */}
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-500 font-semibold">Ukuran:</span>
+                          <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-xs">
+                            {[
+                              { id: 'small', label: 'Kecil' },
+                              { id: 'medium', label: 'Sedang' },
+                              { id: 'large', label: 'Besar' },
+                              { id: 'full', label: 'Penuh' }
+                            ].map((sz) => (
+                              <button
+                                key={sz.id}
+                                type="button"
+                                onClick={() => updateDataPendukungMeta(idx, 'photoSize', sz.id)}
+                                className={`px-2 py-0.5 text-[10px] font-bold rounded transition ${
+                                  (dp.photoSize || 'medium') === sz.id
+                                    ? 'bg-blue-600 text-white shadow-xs'
+                                    : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                              >
+                                {sz.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Align Controls */}
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-500 font-semibold">Posisi:</span>
+                          <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-xs">
+                            {[
+                              { id: 'left', label: 'Kiri' },
+                              { id: 'center', label: 'Tengah' }
+                            ].map((pos) => (
+                              <button
+                                key={pos.id}
+                                type="button"
+                                onClick={() => updateDataPendukungMeta(idx, 'photoAlign', pos.id)}
+                                className={`px-2 py-0.5 text-[10px] font-bold rounded transition ${
+                                  (dp.photoAlign || 'left') === pos.id
+                                    ? 'bg-blue-600 text-white shadow-xs'
+                                    : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                              >
+                                {pos.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
