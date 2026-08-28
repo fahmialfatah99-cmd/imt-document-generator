@@ -45,12 +45,31 @@ export const IOMForm = ({ data, onChange }) => {
   const handlePerkiraanBiayaChange = (val) => {
     const rawDigits = val.replace(/[^0-9]/g, '');
     if (!rawDigits) {
-      updateField('perkiraanBiaya', '');
+      onChange({
+        ...data,
+        perkiraanBiaya: '',
+        biayaYangDiajukan: ''
+      });
       return;
     }
     const num = parseInt(rawDigits, 10);
     const formatted = `Rp ${new Intl.NumberFormat('id-ID').format(num)},-`;
-    updateField('perkiraanBiaya', formatted);
+
+    // Auto-populate / sync biayaYangDiajukan
+    let newBiayaYangDiajukan = data.biayaYangDiajukan || '';
+    if (!newBiayaYangDiajukan || newBiayaYangDiajukan.startsWith('Total Biaya')) {
+      newBiayaYangDiajukan = `Total Biaya Yang Diajukan : ${formatted}`;
+    } else if (/Total Biaya/i.test(newBiayaYangDiajukan)) {
+      newBiayaYangDiajukan = newBiayaYangDiajukan.replace(/Total Biaya(\s*Yang\s*Diajukan)?\s*:\s*Rp\s*[0-9.,-]+/i, `Total Biaya : ${formatted}`);
+    } else {
+      newBiayaYangDiajukan = `${newBiayaYangDiajukan}\n\nTotal Biaya : ${formatted}`;
+    }
+
+    onChange({
+      ...data,
+      perkiraanBiaya: formatted,
+      biayaYangDiajukan: newBiayaYangDiajukan
+    });
   };
 
   const generateIOMNumber = () => {
