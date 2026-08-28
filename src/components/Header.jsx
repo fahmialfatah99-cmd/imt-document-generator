@@ -10,7 +10,9 @@ import {
   Columns, 
   Save, 
   Upload,
-  CheckCircle2
+  CheckCircle2,
+  FolderKanban,
+  FileDown
 } from 'lucide-react';
 
 export const Header = ({
@@ -18,6 +20,8 @@ export const Header = ({
   setActiveDoc,
   viewMode,
   setViewMode,
+  onSaveDoc,
+  savedCount = 0,
   onDownloadPdf,
   onPrint,
   onLoadSample,
@@ -51,9 +55,18 @@ export const Header = ({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
+            {/* Simpan Dokumen langsung ke Web UI */}
+            <button
+              onClick={onSaveDoc}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 hover:bg-emerald-100 rounded-xl shadow-xs transition"
+              title="Simpan dokumen ke daftar dokumen tersimpan di browser"
+            >
+              <Save className="w-4 h-4 text-emerald-600" /> Simpan Dokumen
+            </button>
+
             <button
               onClick={onLoadSample}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition"
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition"
               title="Isi form dengan contoh data siap pakai"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Contoh Data
@@ -132,53 +145,66 @@ export const Header = ({
             >
               3. Bukti Transaksi
             </button>
+            <button
+              onClick={() => setActiveDoc('saved-docs')}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap flex items-center gap-1.5 transition ${
+                activeDoc === 'saved-docs'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-emerald-700 bg-emerald-50/80 hover:bg-emerald-100/70 border border-emerald-200/80'
+              }`}
+            >
+              <FolderKanban className="w-3.5 h-3.5" />
+              <span>Dokumen Tersimpan ({savedCount})</span>
+            </button>
           </div>
 
           {/* View Mode & Utility Controls */}
           <div className="flex items-center gap-3 self-end md:self-auto">
-            {/* View Mode */}
-            <div className="hidden lg:flex items-center bg-slate-200/70 p-1 rounded-xl gap-1">
-              <button
-                onClick={() => setViewMode('split')}
-                className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition ${
-                  viewMode === 'split' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Berdampingan (Form + Preview)"
-              >
-                <Columns className="w-3.5 h-3.5" /> Split
-              </button>
-              <button
-                onClick={() => setViewMode('form')}
-                className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition ${
-                  viewMode === 'form' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Fokus Form Input"
-              >
-                <Edit3 className="w-3.5 h-3.5" /> Form Saja
-              </button>
-              <button
-                onClick={() => setViewMode('preview')}
-                className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition ${
-                  viewMode === 'preview' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
-                title="Fokus Pratinjau Dokumen"
-              >
-                <Eye className="w-3.5 h-3.5" /> Preview Saja
-              </button>
-            </div>
+            {/* View Mode (Only show when not in saved-docs tab) */}
+            {activeDoc !== 'saved-docs' && (
+              <div className="hidden lg:flex items-center bg-slate-200/70 p-1 rounded-xl gap-1">
+                <button
+                  onClick={() => setViewMode('split')}
+                  className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition ${
+                    viewMode === 'split' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                  title="Berdampingan (Form + Preview)"
+                >
+                  <Columns className="w-3.5 h-3.5" /> Split
+                </button>
+                <button
+                  onClick={() => setViewMode('form')}
+                  className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition ${
+                    viewMode === 'form' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                  title="Fokus Form Input"
+                >
+                  <Edit3 className="w-3.5 h-3.5" /> Form Saja
+                </button>
+                <button
+                  onClick={() => setViewMode('preview')}
+                  className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition ${
+                    viewMode === 'preview' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                  title="Fokus Pratinjau Dokumen"
+                >
+                  <Eye className="w-3.5 h-3.5" /> Preview Saja
+                </button>
+              </div>
+            )}
 
             {/* Extra Tools */}
             <div className="flex items-center gap-1 border-l border-slate-300 pl-3">
               <button
                 onClick={onExportJson}
                 className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-lg transition"
-                title="Export Draft (JSON)"
+                title="Download Backup File (JSON)"
               >
-                <Save className="w-4 h-4" />
+                <FileDown className="w-4 h-4" />
               </button>
               <label
                 className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-lg cursor-pointer transition"
-                title="Import Draft (JSON)"
+                title="Import Backup File (JSON)"
               >
                 <input type="file" accept=".json" onChange={onImportJson} className="hidden" />
                 <Upload className="w-4 h-4" />
@@ -186,7 +212,7 @@ export const Header = ({
               <button
                 onClick={onReset}
                 className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
-                title="Reset Semua Data"
+                title="Reset Form"
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
@@ -197,3 +223,4 @@ export const Header = ({
     </header>
   );
 };
+
