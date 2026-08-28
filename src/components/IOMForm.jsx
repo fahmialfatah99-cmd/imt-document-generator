@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, PenTool, Sparkles, RefreshCw, CheckCircle2, Upload } from 'lucide-react';
+import { Plus, Trash2, PenTool, Sparkles, RefreshCw, CheckCircle2, Upload, Paperclip, FileText, X, FileCheck } from 'lucide-react';
 import { SignatureModal } from './SignatureModal';
 import { DEFAULT_SIGNATURES } from '../utils/signatures';
 import { formatDate } from '../utils/formatters';
@@ -80,9 +80,41 @@ export const IOMForm = ({ data, onChange }) => {
     updateField('pertimbangan', list);
   };
 
-  const handleDataPendukungChange = (index, value) => {
+  const handleDataPendukungTextChange = (index, value) => {
     const list = [...(data.dataPendukung || [])];
-    list[index] = value;
+    const current = list[index];
+    if (typeof current === 'object' && current !== null) {
+      list[index] = { ...current, text: value };
+    } else {
+      list[index] = value;
+    }
+    updateField('dataPendukung', list);
+  };
+
+  const handleDataPendukungFileUpload = (index, file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const list = [...(data.dataPendukung || [])];
+      const current = list[index];
+      const currentText = typeof current === 'object' && current !== null ? current.text : current;
+      list[index] = {
+        text: currentText || file.name,
+        fileName: file.name,
+        fileSize: (file.size / 1024).toFixed(1) + ' KB',
+        fileType: file.type,
+        fileData: e.target.result
+      };
+      updateField('dataPendukung', list);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeDataPendukungFile = (index) => {
+    const list = [...(data.dataPendukung || [])];
+    const current = list[index];
+    const currentText = typeof current === 'object' && current !== null ? current.text : current;
+    list[index] = currentText || '';
     updateField('dataPendukung', list);
   };
 
@@ -258,7 +290,7 @@ export const IOMForm = ({ data, onChange }) => {
         <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
           <div>
             <h3 className="text-base font-bold text-slate-800">II. Data Pendukung</h3>
-            <p className="text-xs text-slate-500">Dokumen atau lampiran pendukung</p>
+            <p className="text-xs text-slate-500">Tuliskan nama dokumen atau lampirkan file dokumen pendukung (PDF/Doc/Gambar)</p>
           </div>
           <button
             type="button"
@@ -269,27 +301,68 @@ export const IOMForm = ({ data, onChange }) => {
           </button>
         </div>
 
-        <div className="space-y-2.5">
-          {(data.dataPendukung || []).map((dp, idx) => (
-            <div key={idx} className="flex items-center gap-2">
-              <span className="w-6 py-2 text-xs font-bold text-slate-500 text-center">-</span>
-              <input
-                type="text"
-                value={dp}
-                onChange={(e) => handleDataPendukungChange(idx, e.target.value)}
-                placeholder="Contoh: Penawaran Harga / Invoice Vendor / Bukti Kerusakan"
-                className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => removeDataPendukung(idx)}
-                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
-                title="Hapus baris"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
+        <div className="space-y-3">
+          {(data.dataPendukung || []).map((dp, idx) => {
+            const isObj = typeof dp === 'object' && dp !== null;
+            const textValue = isObj ? (dp.text || '') : (dp || '');
+            const hasFile = isObj && dp.fileName;
+
+            return (
+              <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 py-1 text-xs font-bold text-slate-500 text-center">-</span>
+                  <input
+                    type="text"
+                    value={textValue}
+                    onChange={(e) => handleDataPendukungTextChange(idx, e.target.value)}
+                    placeholder="Contoh: Penawaran Harga Vendor / Invoice / Laporan Teknis"
+                    className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                  
+                  {/* Attach File Button */}
+                  <label className="cursor-pointer px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold rounded-lg flex items-center gap-1.5 border border-blue-200 shrink-0 transition">
+                    <input
+                      type="file"
+                      onChange={(e) => handleDataPendukungFileUpload(idx, e.target.files?.[0])}
+                      className="hidden"
+                    />
+                    <Paperclip className="w-3.5 h-3.5" />
+                    <span>{hasFile ? 'Ganti File' : 'Lampirkan File'}</span>
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() => removeDataPendukung(idx)}
+                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                    title="Hapus baris"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Attached File Indicator Badge */}
+                {hasFile && (
+                  <div className="flex items-center justify-between ml-7 bg-white px-3 py-1.5 rounded-lg border border-emerald-200 text-xs">
+                    <div className="flex items-center gap-2 text-emerald-800">
+                      <FileCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-semibold truncate max-w-[260px] sm:max-w-md">{dp.fileName}</span>
+                      {dp.fileSize && (
+                        <span className="text-[10px] text-slate-400">({dp.fileSize})</span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeDataPendukungFile(idx)}
+                      className="text-slate-400 hover:text-rose-600 p-0.5 rounded transition"
+                      title="Hapus lampiran file ini"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 

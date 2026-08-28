@@ -101,16 +101,30 @@ export const PageIOM = ({ data }) => {
               <div className="font-bold mb-1">II. &nbsp; DATA PENDUKUNG :</div>
               <div className="pl-6 space-y-1">
                 {dataPendukung && dataPendukung.length > 0 ? (
-                  dataPendukung.map((dp, idx) => (
-                    <div key={idx} className="flex items-start">
-                      <span className="w-5 shrink-0">-</span>
-                      <span className="flex-1">{dp}</span>
-                    </div>
-                  ))
+                  dataPendukung.map((dp, idx) => {
+                    const text = typeof dp === 'object' && dp !== null 
+                      ? (dp.text || dp.fileName || '') 
+                      : (dp || '');
+                    const hasFile = typeof dp === 'object' && dp !== null && dp.fileName;
+                    if (!text && !hasFile) return null;
+                    return (
+                      <div key={idx} className="flex items-start">
+                        <span className="w-5 shrink-0">-</span>
+                        <span className="flex-1">
+                          {text}
+                          {hasFile && dp.fileName !== text ? (
+                            <span className="text-[11px] text-slate-600 italic ml-1">
+                              (Lampiran: {dp.fileName})
+                            </span>
+                          ) : null}
+                        </span>
+                      </div>
+                    );
+                  })
                 ) : (
                   <div className="flex">
                     <span className="w-5">-</span>
-                    <span></span>
+                    <span>-</span>
                   </div>
                 )}
               </div>
