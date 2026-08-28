@@ -342,11 +342,12 @@ export const IOMForm = ({ data, onChange }) => {
                   <label className="cursor-pointer px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold rounded-lg flex items-center gap-1.5 border border-blue-200 shrink-0 transition">
                     <input
                       type="file"
+                      accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
                       onChange={(e) => handleDataPendukungFileUpload(idx, e.target.files?.[0])}
                       className="hidden"
                     />
                     <Paperclip className="w-3.5 h-3.5" />
-                    <span>{hasFile ? 'Ganti File' : 'Lampirkan File'}</span>
+                    <span>{hasFile ? 'Ganti File/Foto' : 'Lampirkan Foto/File'}</span>
                   </label>
 
                   <button
@@ -359,23 +360,36 @@ export const IOMForm = ({ data, onChange }) => {
                   </button>
                 </div>
 
-                {/* Attached File Indicator Badge */}
+                {/* Attached File/Photo Indicator with Image Preview */}
                 {hasFile && (
-                  <div className="flex items-center justify-between ml-7 bg-white px-3 py-1.5 rounded-lg border border-emerald-200 text-xs">
-                    <div className="flex items-center gap-2 text-emerald-800">
-                      <FileCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-semibold truncate max-w-[260px] sm:max-w-md">{dp.fileName}</span>
-                      {dp.fileSize && (
-                        <span className="text-[10px] text-slate-400">({dp.fileSize})</span>
+                  <div className="ml-7 bg-white p-2.5 rounded-xl border border-emerald-200 text-xs flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      {dp.fileData && dp.fileData.startsWith('data:image/') ? (
+                        <img
+                          src={dp.fileData}
+                          alt="Thumbnail"
+                          className="h-12 w-16 object-contain rounded border bg-slate-50 p-0.5"
+                        />
+                      ) : (
+                        <FileCheck className="w-5 h-5 text-emerald-600 shrink-0" />
                       )}
+                      <div>
+                        <span className="font-semibold text-emerald-900 block truncate max-w-[240px] sm:max-w-md">
+                          {dp.fileName}
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          {dp.fileSize || 'Lampiran tersimpan'}
+                          {dp.fileData?.startsWith('data:image/') ? ' • Foto siap ditampilkan di dokumen' : ''}
+                        </span>
+                      </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => removeDataPendukungFile(idx)}
-                      className="text-slate-400 hover:text-rose-600 p-0.5 rounded transition"
-                      title="Hapus lampiran file ini"
+                      className="text-slate-400 hover:text-rose-600 p-1.5 hover:bg-rose-50 rounded-lg transition"
+                      title="Hapus lampiran ini"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 )}

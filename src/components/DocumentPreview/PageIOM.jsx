@@ -98,25 +98,47 @@ export const PageIOM = ({ data }) => {
           {/* Section II */}
           <div>
             <div className="font-bold mb-1">II. &nbsp; DATA PENDUKUNG :</div>
-            <div className="pl-5 space-y-1">
+            <div className="pl-5 space-y-2">
               {dataPendukung && dataPendukung.length > 0 ? (
                 dataPendukung.map((dp, idx) => {
-                  const text = typeof dp === 'object' && dp !== null 
-                    ? (dp.text || dp.fileName || '') 
-                    : (dp || '');
-                  const hasFile = typeof dp === 'object' && dp !== null && dp.fileName;
-                  if (!text && !hasFile) return null;
+                  const isObj = typeof dp === 'object' && dp !== null;
+                  const text = isObj ? (dp.text || dp.fileName || '') : (dp || '');
+                  const imageSrc = isObj ? (dp.fileData || dp.image) : null;
+                  const isImage = Boolean(
+                    imageSrc && (
+                      imageSrc.startsWith('data:image/') || 
+                      imageSrc.startsWith('http') || 
+                      dp.fileType?.startsWith('image/') ||
+                      /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(dp.fileName || '')
+                    )
+                  );
+                  const hasNonImageFile = isObj && dp.fileName && !isImage;
+
+                  if (!text && !imageSrc) return null;
                   return (
-                    <div key={idx} className="flex items-start">
-                      <span className="w-5 shrink-0">-</span>
-                      <span className="flex-1">
-                        {text}
-                        {hasFile && dp.fileName !== text ? (
-                          <span className="text-[10.5px] text-slate-600 italic ml-1">
-                            (Lampiran: {dp.fileName})
-                          </span>
-                        ) : null}
-                      </span>
+                    <div key={idx} className="space-y-1.5">
+                      <div className="flex items-start">
+                        <span className="w-5 shrink-0">-</span>
+                        <span className="flex-1 font-medium">
+                          {text}
+                          {hasNonImageFile && dp.fileName !== text ? (
+                            <span className="text-[10.5px] text-slate-600 italic ml-1">
+                              (Lampiran File: {dp.fileName})
+                            </span>
+                          ) : null}
+                        </span>
+                      </div>
+
+                      {/* Display attached photo preview directly */}
+                      {isImage && (
+                        <div className="ml-5 mt-1 border border-black/40 rounded p-1 bg-white inline-block shadow-sm">
+                          <img
+                            src={imageSrc}
+                            alt={dp.fileName || `Foto Data Pendukung ${idx + 1}`}
+                            className="max-h-[160px] max-w-[320px] object-contain rounded"
+                          />
+                        </div>
+                      )}
                     </div>
                   );
                 })
