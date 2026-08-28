@@ -92,9 +92,41 @@ export default function App() {
   const [docData, setDocData] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // fallback
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          return {
+            ...INITIAL_DATA,
+            ...parsed,
+            iom: {
+              ...INITIAL_DATA.iom,
+              ...(parsed.iom || {}),
+              pertimbangan: Array.isArray(parsed.iom?.pertimbangan) ? parsed.iom.pertimbangan : INITIAL_DATA.iom.pertimbangan,
+              dataPendukung: Array.isArray(parsed.iom?.dataPendukung) ? parsed.iom.dataPendukung : INITIAL_DATA.iom.dataPendukung,
+              signatures: {
+                ...INITIAL_DATA.iom.signatures,
+                ...(parsed.iom?.signatures || {})
+              }
+            },
+            settlement: {
+              ...INITIAL_DATA.settlement,
+              ...(parsed.settlement || {}),
+              items: Array.isArray(parsed.settlement?.items) ? parsed.settlement.items : INITIAL_DATA.settlement.items,
+              signatures: {
+                ...INITIAL_DATA.settlement.signatures,
+                ...(parsed.settlement?.signatures || {})
+              }
+            },
+            evidence: {
+              ...INITIAL_DATA.evidence,
+              ...(parsed.evidence || {}),
+              evidences: Array.isArray(parsed.evidence?.evidences) ? parsed.evidence.evidences : INITIAL_DATA.evidence.evidences
+            }
+          };
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to parse docData from localStorage, using INITIAL_DATA', err);
     }
     return INITIAL_DATA;
   });
