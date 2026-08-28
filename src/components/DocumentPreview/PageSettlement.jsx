@@ -40,7 +40,7 @@ export const PageSettlement = ({ data }) => {
   }
 
   return (
-    <div className="a4-page bg-white text-black text-[12px] flex flex-col justify-between select-none relative box-border" style={{ minHeight: '297mm', padding: '14mm 16mm' }}>
+    <div className="a4-page bg-white text-black text-[12px] flex flex-col select-none relative box-border" style={{ minHeight: '297mm', padding: '14mm 16mm' }}>
       <div>
         {/* Header */}
         <div className="flex justify-between items-end pb-1">
@@ -177,7 +177,7 @@ export const PageSettlement = ({ data }) => {
       </div>
 
       {/* Signature Section */}
-      <div className="grid grid-cols-[3fr_1.3fr] gap-6 mt-3 text-[11px]">
+      <div className="grid grid-cols-[3fr_1.3fr] gap-4 mt-4 text-[11px]">
         {/* Left Signature Box (3 people: Prepared, Checked, Checked) */}
         <div className="border border-black">
           <div className="grid grid-cols-3 divide-x border-b border-black text-center py-1 font-medium bg-slate-50">

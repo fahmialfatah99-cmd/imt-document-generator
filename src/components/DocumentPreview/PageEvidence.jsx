@@ -27,7 +27,7 @@ export const PageEvidence = ({ data }) => {
       {pages.map((pageSlots, pageIdx) => (
         <div
           key={pageIdx}
-          className="a4-page print-page-break bg-white text-black text-[12.5px] flex flex-col justify-between select-none relative box-border"
+          className="a4-page print-page-break bg-white text-black text-[12.5px] flex flex-col select-none relative box-border"
           style={{ minHeight: '297mm', padding: '14mm 16mm' }}
         >
           <div>

@@ -25,7 +25,7 @@ export const PageIOM = ({ data }) => {
   const displayedBiaya = biayaYangDiajukan || (perkiraanBiaya ? `Total Biaya Yang Diajukan : ${perkiraanBiaya}` : '');
 
   return (
-    <div className="a4-page bg-white text-black text-[12.5px] flex flex-col justify-between select-none relative box-border" style={{ minHeight: '297mm', padding: '14mm 16mm' }}>
+    <div className="a4-page bg-white text-black text-[12.5px] flex flex-col select-none relative box-border" style={{ minHeight: '297mm', padding: '14mm 16mm' }}>
       <div className="space-y-2">
         {/* Header */}
         <div className="text-center mb-1">
