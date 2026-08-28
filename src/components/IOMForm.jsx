@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, PenTool, Sparkles, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Plus, Trash2, PenTool, Sparkles, RefreshCw, CheckCircle2, Upload } from 'lucide-react';
 import { SignatureModal } from './SignatureModal';
 import { DEFAULT_SIGNATURES } from '../utils/signatures';
 import { formatDate } from '../utils/formatters';
