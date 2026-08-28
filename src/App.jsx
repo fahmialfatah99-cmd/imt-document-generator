@@ -509,8 +509,12 @@ export default function App() {
                   <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                     Live Preview Dokumen (Ukuran A4)
                   </span>
-                  <span className="text-xs text-slate-400">
-                    {activeDoc === 'all' ? '3 Halaman' : '1 Halaman'}
+                  <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                    {activeDoc === 'all' 
+                      ? `${2 + Math.ceil((docData.evidence?.evidences?.length || 1) / 4)} Halaman`
+                      : activeDoc === 'evidence'
+                      ? `${Math.ceil((docData.evidence?.evidences?.length || 1) / 4)} Halaman`
+                      : '1 Halaman'}
                   </span>
                 </div>
 

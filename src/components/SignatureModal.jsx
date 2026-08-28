@@ -7,40 +7,18 @@ export const SignatureModal = ({
   isOpen,
   onClose,
   onSave,
-  title = 'Tanda Tangan',
+  title = 'Lampirkan Tanda Tangan',
   currentSignature = null
 }) => {
-  const canvasRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [hasDrawn, setHasDrawn] = useState(false);
-  const [activeTab, setActiveTab] = useState('draw'); // 'draw', 'presets', 'upload'
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'presets'
   const [previewImage, setPreviewImage] = useState(null);
 
   // Synchronize when modal opens or current signature changes
   useEffect(() => {
     if (isOpen) {
       setPreviewImage(currentSignature || null);
-      setHasDrawn(false);
-
-      // Delay slightly to ensure canvas DOM is mounted and visible
-      const timer = setTimeout(() => {
-        if (canvasRef.current) {
-          const canvas = canvasRef.current;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.strokeStyle = '#0f172a';
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-          }
-        }
-      }, 60);
-
-      // Disable body scroll when modal is open
       document.body.style.overflow = 'hidden';
       return () => {
-        clearTimeout(timer);
         document.body.style.overflow = '';
       };
     } else {
@@ -49,71 +27,6 @@ export const SignatureModal = ({
   }, [isOpen, currentSignature]);
 
   if (!isOpen) return null;
-
-  const getCanvasCoordinates = (e) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    const rect = canvas.getBoundingClientRect();
-    
-    // Support mouse or touch
-    const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
-
-    if (clientX === undefined || clientY === undefined) return { x: 0, y: 0 };
-
-    const scaleX = canvas.width / (rect.width || 1);
-    const scaleY = canvas.height / (rect.height || 1);
-
-    return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY
-    };
-  };
-
-  const startDrawing = (e) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const { x, y } = getCanvasCoordinates(e);
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    setIsDrawing(true);
-    setHasDrawn(true);
-  };
-
-  const draw = (e) => {
-    if (!isDrawing) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    if (e.cancelable && e.touches) {
-      e.preventDefault();
-    }
-
-    const { x, y } = getCanvasCoordinates(e);
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  };
-
-  const stopDrawing = () => {
-    setIsDrawing(false);
-  };
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    setHasDrawn(false);
-  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
@@ -127,18 +40,7 @@ export const SignatureModal = ({
   };
 
   const handleSave = () => {
-    if (activeTab === 'draw') {
-      if (hasDrawn && canvasRef.current) {
-        const dataUrl = canvasRef.current.toDataURL('image/png');
-        onSave(dataUrl);
-      } else if (previewImage) {
-        onSave(previewImage);
-      } else {
-        onSave(null);
-      }
-    } else if (activeTab === 'presets' || activeTab === 'upload') {
-      onSave(previewImage || null);
-    }
+    onSave(previewImage || null);
     onClose();
   };
 
@@ -156,14 +58,16 @@ export const SignatureModal = ({
       }}
     >
       <div 
-        className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col border border-slate-200 z-[10000] relative"
+        className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col border border-slate-200 z-[10000] relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
           <div>
-            <h3 className="font-bold text-slate-800 text-base">{title}</h3>
-            <p className="text-xs text-slate-500">Pilih metode pembuatan tanda tangan digital</p>
+            <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
+              <Upload className="w-4 h-4 text-blue-600" /> {title}
+            </h3>
+            <p className="text-xs text-slate-500">Lampirkan file gambar tanda tangan atau pilih preset</p>
           </div>
           <button
             type="button"
@@ -178,12 +82,12 @@ export const SignatureModal = ({
         <div className="flex border-b border-slate-200 bg-slate-100/80 p-1.5 gap-1.5 mx-6 mt-4 rounded-xl">
           <button
             type="button"
-            onClick={() => setActiveTab('draw')}
+            onClick={() => setActiveTab('upload')}
             className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition ${
-              activeTab === 'draw' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              activeTab === 'upload' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <PenTool className="w-3.5 h-3.5" /> Gores Langsung
+            <Upload className="w-3.5 h-3.5" /> 1. Upload File Gambar
           </button>
           <button
             type="button"
@@ -192,53 +96,46 @@ export const SignatureModal = ({
               activeTab === 'presets' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" /> Preset Template
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('upload')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition ${
-              activeTab === 'upload' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Upload className="w-3.5 h-3.5" /> Upload File
+            <Sparkles className="w-3.5 h-3.5" /> 2. Preset Template
           </button>
         </div>
 
         {/* Tab Content */}
         <div className="p-6">
-          {activeTab === 'draw' && (
-            <div>
-              <div className="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50/70 relative overflow-hidden">
-                <canvas
-                  ref={canvasRef}
-                  width={460}
-                  height={180}
-                  onMouseDown={startDrawing}
-                  onMouseMove={draw}
-                  onMouseUp={stopDrawing}
-                  onMouseLeave={stopDrawing}
-                  onTouchStart={startDrawing}
-                  onTouchMove={draw}
-                  onTouchEnd={stopDrawing}
-                  className="w-full h-[180px] cursor-crosshair block"
-                />
-                {!hasDrawn && (
-                  <div className="absolute inset-0 flex items-center justify-center text-xs text-slate-400 select-none pointer-events-none">
-                    Gores tanda tangan di area ini (Touch / Mouse)
+          {activeTab === 'upload' && (
+            <div className="space-y-4">
+              <label className="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer bg-slate-50/60 hover:bg-blue-50/20 transition group">
+                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                  <Upload className="w-6 h-6" />
+                </div>
+                <span className="text-xs font-bold text-slate-800">Klik untuk lampirkan file tanda tangan</span>
+                <span className="text-[11px] text-slate-400 mt-1">Format PNG / JPG / WebP (disarankan background transparan)</span>
+              </label>
+
+              {previewImage && (
+                <div className="border border-slate-200 rounded-xl p-3.5 flex items-center justify-between bg-slate-50">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={previewImage}
+                      alt="Preview"
+                      className="h-14 max-w-[140px] object-contain bg-white rounded-lg border p-1"
+                    />
+                    <div>
+                      <span className="text-xs font-semibold text-slate-700 block">File gambar terpilih</span>
+                      <span className="text-[10px] text-emerald-600 font-medium">✓ Siap dipasang</span>
+                    </div>
                   </div>
-                )}
-              </div>
-              <div className="flex justify-between items-center mt-3">
-                <button
-                  type="button"
-                  onClick={clearCanvas}
-                  className="inline-flex items-center gap-1.5 text-xs text-rose-600 hover:text-rose-700 font-medium px-3 py-1.5 rounded-lg hover:bg-rose-50 transition"
-                >
-                  <Trash2 className="w-3.5 h-3.5" /> Bersihkan Canvas
-                </button>
-                <span className="text-[11px] text-slate-400">Transparan otomatis</span>
-              </div>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewImage(null)}
+                    className="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 p-2 rounded-lg transition"
+                    title="Hapus gambar"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -294,37 +191,6 @@ export const SignatureModal = ({
                   <span className="text-[11px] font-bold text-slate-700">Paraf User</span>
                 </button>
               </div>
-            </div>
-          )}
-
-          {activeTab === 'upload' && (
-            <div className="space-y-3">
-              <label className="border-2 border-dashed border-slate-300 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50/20 transition">
-                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-                <Upload className="w-8 h-8 text-blue-500 mb-2" />
-                <span className="text-xs font-semibold text-slate-700">Pilih gambar tanda tangan (PNG / JPG)</span>
-                <span className="text-[11px] text-slate-400 mt-1">Disarankan berlatar belakang transparan atau putih</span>
-              </label>
-
-              {previewImage && (
-                <div className="border border-slate-200 rounded-xl p-3 flex items-center justify-between bg-slate-50">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={previewImage}
-                      alt="Preview"
-                      className="h-12 max-w-[120px] object-contain bg-white rounded border p-1"
-                    />
-                    <span className="text-xs text-slate-600">Gambar terpilih</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setPreviewImage(null)}
-                    className="text-xs text-rose-600 hover:underline font-medium"
-                  >
-                    Hapus
-                  </button>
-                </div>
-              )}
             </div>
           )}
         </div>

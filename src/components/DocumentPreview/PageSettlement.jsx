@@ -212,10 +212,16 @@ export const PageSettlement = ({ data }) => {
             <div>{signatures?.checkedByRPM?.name || 'RPM'}</div>
             <div>{signatures?.checkedBySeptya?.name || 'Septya'}</div>
           </div>
+          {/* Date Row - Otomatis dari Tanggal Settlement */}
+          <div className="grid grid-cols-3 divide-x border-t border-black text-center text-[10px] py-0.5 bg-slate-50 font-normal">
+            <div>Date: {formatDate(tanggal, 'short') || '-'}</div>
+            <div>Date: {formatDate(tanggal, 'short') || '-'}</div>
+            <div>Date: {formatDate(tanggal, 'short') || '-'}</div>
+          </div>
         </div>
 
         {/* Right Signature Box (Approved by Pimpinan) */}
-        <div className="border border-black">
+        <div className="border border-black flex flex-col justify-between">
           <div className="border-b border-black text-center py-1 font-medium bg-slate-50">
             Approved by
           </div>
@@ -228,6 +234,10 @@ export const PageSettlement = ({ data }) => {
           {/* Name Row */}
           <div className="border-t border-black text-center py-1 font-medium">
             {signatures?.approvedBy?.name || 'Pimpinan'}
+          </div>
+          {/* Date Row - Otomatis dari Tanggal Settlement */}
+          <div className="border-t border-black text-center text-[10px] py-0.5 bg-slate-50 font-normal">
+            Date: {formatDate(tanggal, 'short') || '-'}
           </div>
         </div>
       </div>

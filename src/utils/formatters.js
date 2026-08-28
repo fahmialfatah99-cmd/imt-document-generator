@@ -2,8 +2,7 @@
 
 export const formatRupiah = (value, includePrefix = false) => {
   if (value === null || value === undefined || value === '') return includePrefix ? 'Rp 0' : '0';
-  const num = typeof value === 'number' ? value : parseFloat(String(value).replace(/[^0-9.-]+/g, '')) || 0;
-  
+  const num = typeof value === 'number' ? value : parseNumber(value);
   const formatted = new Intl.NumberFormat('id-ID').format(num);
   return includePrefix ? `Rp ${formatted}` : formatted;
 };
@@ -11,8 +10,8 @@ export const formatRupiah = (value, includePrefix = false) => {
 export const parseNumber = (value) => {
   if (typeof value === 'number') return value;
   if (!value) return 0;
-  const cleaned = String(value).replace(/[^0-9.-]+/g, '');
-  const num = parseFloat(cleaned);
+  const digitsOnly = String(value).replace(/[^0-9]/g, '');
+  const num = parseInt(digitsOnly, 10);
   return isNaN(num) ? 0 : num;
 };
 

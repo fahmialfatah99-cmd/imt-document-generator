@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, PenTool, Sparkles, Calculator, Calendar } from 'lucide-react';
+import { Plus, Trash2, PenTool, Sparkles, Calculator, Calendar, Upload } from 'lucide-react';
 import { SignatureModal } from './SignatureModal';
 import { DEFAULT_SIGNATURES } from '../utils/signatures';
 import { formatRupiah, parseNumber } from '../utils/formatters';
@@ -101,7 +101,7 @@ export const SettlementForm = ({ data, onChange }) => {
 
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">
-              Tanggal (Date) <span className="text-[10px] text-slate-500 font-normal">(Diisi Manual)</span>
+              Tanggal (Date) <span className="text-[10px] text-blue-600 font-normal">(Diisi Manual & mengisi TTD bawah)</span>
             </label>
             <input
               type="date"
@@ -294,9 +294,9 @@ export const SettlementForm = ({ data, onChange }) => {
               <button
                 type="button"
                 onClick={() => setActiveSignModal('preparedBy')}
-                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium flex items-center gap-1 transition"
+                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
               >
-                <PenTool className="w-3.5 h-3.5" /> Atur
+                <Upload className="w-3.5 h-3.5" /> Lampirkan File
               </button>
             </div>
           </div>
@@ -324,9 +324,9 @@ export const SettlementForm = ({ data, onChange }) => {
               <button
                 type="button"
                 onClick={() => setActiveSignModal('checkedByRPM')}
-                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium flex items-center gap-1 transition"
+                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
               >
-                <PenTool className="w-3.5 h-3.5" /> Atur
+                <Upload className="w-3.5 h-3.5" /> Lampirkan File
               </button>
             </div>
           </div>
@@ -363,9 +363,9 @@ export const SettlementForm = ({ data, onChange }) => {
               <button
                 type="button"
                 onClick={() => setActiveSignModal('checkedBySeptya')}
-                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium flex items-center gap-1 transition"
+                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
               >
-                <PenTool className="w-3.5 h-3.5" /> Atur
+                <Upload className="w-3.5 h-3.5" /> Lampirkan File
               </button>
             </div>
           </div>
@@ -402,9 +402,9 @@ export const SettlementForm = ({ data, onChange }) => {
               <button
                 type="button"
                 onClick={() => setActiveSignModal('approvedBy')}
-                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium flex items-center gap-1 transition"
+                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
               >
-                <PenTool className="w-3.5 h-3.5" /> Atur
+                <Upload className="w-3.5 h-3.5" /> Lampirkan File
               </button>
             </div>
           </div>
@@ -416,7 +416,7 @@ export const SettlementForm = ({ data, onChange }) => {
         isOpen={Boolean(activeSignModal)}
         onClose={() => setActiveSignModal(null)}
         onSave={(signData) => updateSignature(activeSignModal, signData)}
-        title={`Tanda Tangan - ${activeSignModal?.toUpperCase()}`}
+        title={`Lampirkan TTD - ${activeSignModal?.toUpperCase()}`}
         currentSignature={activeSignModal ? data.signatures?.[activeSignModal]?.sign : null}
       />
     </div>

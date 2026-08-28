@@ -42,6 +42,17 @@ export const IOMForm = ({ data, onChange }) => {
     });
   };
 
+  const handlePerkiraanBiayaChange = (val) => {
+    const rawDigits = val.replace(/[^0-9]/g, '');
+    if (!rawDigits) {
+      updateField('perkiraanBiaya', '');
+      return;
+    }
+    const num = parseInt(rawDigits, 10);
+    const formatted = `Rp ${new Intl.NumberFormat('id-ID').format(num)},-`;
+    updateField('perkiraanBiaya', formatted);
+  };
+
   const generateIOMNumber = () => {
     const today = new Date();
     const romanMonths = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
@@ -176,13 +187,15 @@ export const IOMForm = ({ data, onChange }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Perkiraan Biaya</label>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">
+              Perkiraan Biaya <span className="text-[10px] text-blue-600 font-normal">(Otomatis format Rp)</span>
+            </label>
             <input
               type="text"
               value={data.perkiraanBiaya || ''}
-              onChange={(e) => updateField('perkiraanBiaya', e.target.value)}
-              placeholder="Contoh: Rp 2.500.000,-"
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold text-blue-900"
+              onChange={(e) => handlePerkiraanBiayaChange(e.target.value)}
+              placeholder="Ketik angka (Contoh: 1850000)"
+              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold text-blue-900"
             />
           </div>
 
@@ -348,9 +361,9 @@ export const IOMForm = ({ data, onChange }) => {
               <button
                 type="button"
                 onClick={() => setActiveSignModal('diajukan')}
-                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium flex items-center gap-1 transition"
+                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
               >
-                <PenTool className="w-3.5 h-3.5" /> Atur
+                <Upload className="w-3.5 h-3.5" /> Lampirkan File
               </button>
             </div>
           </div>
@@ -378,9 +391,9 @@ export const IOMForm = ({ data, onChange }) => {
               <button
                 type="button"
                 onClick={() => setActiveSignModal('diketahui')}
-                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium flex items-center gap-1 transition"
+                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
               >
-                <PenTool className="w-3.5 h-3.5" /> Atur
+                <Upload className="w-3.5 h-3.5" /> Lampirkan File
               </button>
             </div>
           </div>
@@ -417,9 +430,9 @@ export const IOMForm = ({ data, onChange }) => {
               <button
                 type="button"
                 onClick={() => setActiveSignModal('direview')}
-                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium flex items-center gap-1 transition"
+                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
               >
-                <PenTool className="w-3.5 h-3.5" /> Atur
+                <Upload className="w-3.5 h-3.5" /> Lampirkan File
               </button>
             </div>
           </div>
@@ -456,9 +469,9 @@ export const IOMForm = ({ data, onChange }) => {
               <button
                 type="button"
                 onClick={() => setActiveSignModal('disetujui')}
-                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium flex items-center gap-1 transition"
+                className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
               >
-                <PenTool className="w-3.5 h-3.5" /> Atur
+                <Upload className="w-3.5 h-3.5" /> Lampirkan File
               </button>
             </div>
           </div>
@@ -470,7 +483,7 @@ export const IOMForm = ({ data, onChange }) => {
         isOpen={Boolean(activeSignModal)}
         onClose={() => setActiveSignModal(null)}
         onSave={(signData) => updateSignature(activeSignModal, signData)}
-        title={`Tanda Tangan - ${activeSignModal?.toUpperCase()}`}
+        title={`Lampirkan TTD - ${activeSignModal?.toUpperCase()}`}
         currentSignature={activeSignModal ? data.signatures?.[activeSignModal]?.sign : null}
       />
     </div>
